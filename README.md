@@ -1,0 +1,4 @@
+.maid
+=====
+
+My Maid rules
