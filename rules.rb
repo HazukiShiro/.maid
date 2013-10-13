@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # This is free and unencumbered software released into the public domain.
 #
 # Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -38,14 +36,20 @@ DOWNLOADED_TARBALLS = "#{DOWNLOADS}/tarballs"
 DOWNLOADED_DOCUMENTS = "#{DOWNLOADS}/documents"
 DOWNLOADED_SOFTWARE = "#{DOWNLOADS}/software"
 
+WINAMP_SKINS = "#{DOWNLOADS}/winamp-skins"
+CHROME_FILES = "#{DOWNLOADS}/chrome-related"
+
 DOWNLOADED_RENDERS = "#{DOWNLOADS}/renders"
 DOWNLOADED_C4D = "#{DOWNLOADS}/c4d"
 
 LOSSY_PICS = "#{DOWNLOADED_PICTURES}/lossy"
 LOSSLESS_PICS = "#{DOWNLOADED_PICTURES}/lossless"
+IMAGE_PACKS = "#{DOWNLOADED_PICTURES}/archives"
 
 DOWNLOADED_SOFTWARE_BUILDS = "#{DOWNLOADED_SOFTWARE}/builds"
 DOWNLOADED_SOFTWARE_SOURCES = "#{DOWNLOADED_SOFTWARE}/sources"
+
+LEGACY_SOFTWARE_SOURCES = "#{DOWNLOADED_SOFTWARE_SOURCES}/_legacy"
 
 
 C4D_REGEXP = /^c4d[\-\._]|[\-\._]c4d[\-\._]/i
@@ -65,14 +69,23 @@ C4D_REGEXP = /^c4d[\-\._]|[\-\._]c4d[\-\._]/i
   
   DOWNLOADED_SOFTWARE_BUILDS,
   DOWNLOADED_SOFTWARE_SOURCES,
+
+  LEGACY_SOFTWARE_SOURCES,
   
   LOSSY_PICS,
   LOSSLESS_PICS,
+  IMAGE_PACKS,
   
+  WINAMP_SKINS,
+  CHROME_FILES,
+  
+  # These are not on vars. I'm pretty sure I won't change these
+  # dirs.
   File.expand_path('~/Downloads/konachan'),
   File.expand_path('~/Downloads/yandere'),
-].each do |x|
-  Dir.mkdir(x) unless Dir.exist?(x)
+  File.expand_path('~/Downloads/cuanta-razon'),
+].each do |path|
+  Dir.mkdir(path) unless Dir.exist?(path)
 end
 
 
@@ -91,6 +104,66 @@ Maid.rules do
       dir_safe( "~/Downloads/*.#{ext}" ).each do |file|
         move file, DOWNLOADED_DOCUMENTS
       end
+    end
+  end
+  
+  
+  rule 'Downloaded Chrome files' do
+  
+    dir_safe( "~/Downloads/*.crx" ).each do |file|
+      move file, CHROME_FILES
+    end
+  end
+  
+  
+  rule 'Downloaded Winamp skins' do
+  
+    dir_safe( "~/Downloads/*.wal" ).each do |file|
+      move file, WINAMP_SKINS
+    end
+  end
+  
+  
+  rule 'Downloaded pics archives' do
+  
+    dir_safe( "~/Downloads/*.zip" ).select do |file|
+      images = 0
+      no_images = 0
+      
+      zipfile_contents(file).each do |f|
+        unless f =~ /\/$/
+          if f =~ /\.(png|jpe?g)$/
+            images += 1
+          else
+            no_images += 1
+          end
+        end
+      end
+      
+      select = nil
+      
+      # 100% images
+      select = true if images > 0 and no_images == 0
+      
+      if select.nil?
+      
+        if images == 0
+        
+          select = false
+          
+        elsif no_images > 0
+          
+          ratio = images / no_images
+          
+          select = true if ratio > 3
+          
+        end
+      end
+      
+      select
+      
+    end.each do |file|
+      move file, IMAGE_PACKS
     end
   end
 
@@ -179,6 +252,10 @@ Maid.rules do
       elsif filename =~ /^yande[\.\-]re/i
       
         move file, '~/Downloads/yandere'
+
+      elsif filename =~ /^CR_[0-9]+/
+
+        move file, '~/Downloads/cuanta-razon'
         
       elsif filename =~ /\.png$/
       
@@ -227,7 +304,7 @@ Maid.rules do
         
         filename = File.basename(file)
 
-        if filename =~ /[\-_]v?[0-9]+[\-\._][0-9]+[\-\._][0-9]+[\-\._]/
+        if filename =~ /[\-_][rv]?[0-9]+[\-\._][0-9]+[\-\._][0-9]+[\-\._]/
           move file, DOWNLOADED_SOFTWARE
         end
       end
@@ -243,6 +320,20 @@ Maid.rules do
         move file, DOWNLOADED_SOFTWARE_SOURCES
       end
     end
+  end
+
+  rule 'Legacy software archives' do
+    dir("#{DOWNLOADED_SOFTWARE_SOURCES}/*").select do |file|
+      versions = versions_of file
+      if versions.length > 1
+        file != versions.pop
+      else
+        false
+      end
+    end.each do |file|
+      move file, LEGACY_SOFTWARE_SOURCES
+    end
+    
   end
 
 end

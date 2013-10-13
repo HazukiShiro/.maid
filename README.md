@@ -1,6 +1,10 @@
 # /home/shiro/.maid
 
-[Maid][benjaminoakes/maid] rules.
+> "Disorder, disorder, disorder."
+> -- *Lyrics from Toxicity, by System of a Down*
+
+
+My personal rules for [Maid][benjaminoakes/maid].
 
 [benjaminoakes/maid]: <https://github.com/benjaminoakes/maid>
 
