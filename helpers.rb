@@ -23,23 +23,28 @@
 #
 # For more information, please refer to <http://unlicense.org/>
 
+require 'cgi'
+
 
 def downloading?(file)
   
+  # Firefox
+  return true if file =~ /\.part$/
   return true if File.exist?("#{file}.part")
 
-  base_dir = File.dirname file
-  name = File.basename(file)
+  # Chrom*
+  return true if file =~ /\.crdownload$/
+
+  base_dir, name = File.split file
 
   # I usually save links in files named 'pending', 'pending-pics'... and
   # download 'em using `wget -ci`
   dir("#{base_dir}/pending*").any? do |links_file|
     
     File.readlines(links_file).any? do |link|
-      link_filename = File.basename(link)
-      link_filename.chop! while link_filename =~ /\s$/
+      link_filename = File.basename(link).strip
       
-      name == link_filename
+      name == CGI::unescape(link_filename)
     end
     
   end

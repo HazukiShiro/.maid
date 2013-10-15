@@ -23,30 +23,30 @@
 #
 # For more information, please refer to <http://unlicense.org/>
 
-require File.expand_path('../helpers', __FILE__)
+require File.expand_path '../helpers', __FILE__
 
 
 DOWNLOADS = File.expand_path '~/Downloads'
 
-DOWNLOADED_PICTURES = "#{DOWNLOADS}/pictures"
-DOWNLOADED_VECTORS = "#{DOWNLOADS}/vectors"
-DOWNLOADED_MUSIC = "#{DOWNLOADS}/music"
-DOWNLOADED_ARCHIVES = "#{DOWNLOADS}/archives"
-DOWNLOADED_TARBALLS = "#{DOWNLOADS}/tarballs"
-DOWNLOADED_DOCUMENTS = "#{DOWNLOADS}/documents"
-DOWNLOADED_SOFTWARE = "#{DOWNLOADS}/software"
+DOWNLOADED_PICTURES   = "#{DOWNLOADS}/pictures"
+DOWNLOADED_VECTORS    = "#{DOWNLOADS}/vectors"
+DOWNLOADED_MUSIC      = "#{DOWNLOADS}/music"
+DOWNLOADED_ARCHIVES   = "#{DOWNLOADS}/archives"
+DOWNLOADED_TARBALLS   = "#{DOWNLOADS}/tarballs"
+DOWNLOADED_DOCUMENTS  = "#{DOWNLOADS}/documents"
+DOWNLOADED_SOFTWARE   = "#{DOWNLOADS}/software"
 
 WINAMP_SKINS = "#{DOWNLOADS}/winamp-skins"
 CHROME_FILES = "#{DOWNLOADS}/chrome-related"
 
-DOWNLOADED_RENDERS = "#{DOWNLOADS}/renders"
-DOWNLOADED_C4D = "#{DOWNLOADS}/c4d"
+DOWNLOADED_RENDERS  = "#{DOWNLOADS}/renders"
+DOWNLOADED_C4D      = "#{DOWNLOADS}/c4d"
 
-LOSSY_PICS = "#{DOWNLOADED_PICTURES}/lossy"
+LOSSY_PICS    = "#{DOWNLOADED_PICTURES}/lossy"
 LOSSLESS_PICS = "#{DOWNLOADED_PICTURES}/lossless"
-IMAGE_PACKS = "#{DOWNLOADED_PICTURES}/archives"
+IMAGE_PACKS   = "#{DOWNLOADED_PICTURES}/archives"
 
-DOWNLOADED_SOFTWARE_BUILDS = "#{DOWNLOADED_SOFTWARE}/builds"
+DOWNLOADED_SOFTWARE_BUILDS  = "#{DOWNLOADED_SOFTWARE}/builds"
 DOWNLOADED_SOFTWARE_SOURCES = "#{DOWNLOADED_SOFTWARE}/sources"
 
 LEGACY_SOFTWARE_SOURCES = "#{DOWNLOADED_SOFTWARE_SOURCES}/_legacy"
@@ -275,7 +275,7 @@ Maid.rules do
       
       if filename =~ C4D_REGEXP
         move file, DOWNLOADED_C4D
-      elsif filename =~ /^[\-\._]?render[\-\._]/i
+      elsif filename =~ /^[\-\._\s]?render[\-\._\s]/i
         move file, DOWNLOADED_RENDERS
       end
       
@@ -322,14 +322,19 @@ Maid.rules do
     end
   end
 
+
   rule 'Legacy software archives' do
+
     dir("#{DOWNLOADED_SOFTWARE_SOURCES}/*").select do |file|
+      
       versions = versions_of file
+
       if versions.length > 1
         file != versions.pop
       else
         false
       end
+
     end.each do |file|
       move file, LEGACY_SOFTWARE_SOURCES
     end
